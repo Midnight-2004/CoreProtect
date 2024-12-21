@@ -1,10 +1,12 @@
 name: Build
+
 on:
   push:
     branches:
       - master
   pull_request:
     types: [opened, synchronize, reopened]
+
 jobs:
   build:
     name: Build
@@ -13,16 +15,26 @@ jobs:
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Shallow clones should be disabled for a better relevancy of analysis
+
       - name: Set up JDK 21
         uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
+
       - name: Cache Maven packages
-        uses: actions/cache@v1
+        uses: actions/cache@v3
         with:
           path: ~/.m2
           key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
           restore-keys: ${{ runner.os }}-m2
-      - name: Build
+
+      - name: Build with Maven
         run: mvn -B verify
+
+      - name: Upload Plugin JAR as Artifact
+        if: success()  # Only upload if the previous step (build) was successful
+        uses: actions/upload-artifact@v3
+        with:
+          name: plugin-jar  # The name of the artifact
+          path: target/*.jar  # Path to the generated JAR file(s), adjust as necessary
