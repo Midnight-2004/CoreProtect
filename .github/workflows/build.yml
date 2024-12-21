@@ -38,3 +38,4 @@ jobs:
         with:
           name: plugin-jar  # The name of the artifact
           path: target/*.jar  # Path to the generated JAR file(s), adjust as necessary
+
